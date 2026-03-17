@@ -1,6 +1,19 @@
 {
   "name": "@skelix/cli",
   "version": "0.1.0",
+  "description": "CLI to auto-generate skeleton loading components from React components",
+  "author": "Dushyant Pant <dushyantpant5@github>",
+  "license": "MIT",
+  "homepage": "https://github.com/dushyantpant5/skelix#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dushyantpant5/skelix.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/dushyantpant5/skelix/issues"
+  },
+  "keywords": ["skeleton", "shimmer", "react", "loading", "tailwind", "cli", "codegen"],
   "bin": {
     "skelix": "./dist/index.js"
   },
@@ -17,8 +30,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --banner.js '#!/usr/bin/env node'",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --banner.js '#!/usr/bin/env node' --watch"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "dependencies": {
     "@skelix/core": "*",

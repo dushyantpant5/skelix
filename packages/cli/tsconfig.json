@@ -1,17 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "paths": {
-      "@skelix/core": ["../core/src/index.ts"],
-      "@skelix/adapters": ["../adapters/src/index.ts"]
-    }
+    "rootDir": "src"
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../adapters" }
-  ]
+  "include": ["src/**/*"]
 }

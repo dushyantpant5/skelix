@@ -42,6 +42,12 @@ For all options, configuration, custom components, and examples — **see [GUIDE
 
 ---
 
+## Repository
+
+[github.com/dushyantpant5/skelix](https://github.com/dushyantpant5/skelix) — report bugs or request features in [Issues](https://github.com/dushyantpant5/skelix/issues).
+
+---
+
 ## Contributing / Development
 
 ```bash

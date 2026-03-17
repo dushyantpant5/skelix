@@ -1,11 +1,16 @@
 {
   "name": "skelix",
   "private": true,
+  "author": "Dushyant Pant",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dushyantpant5/skelix.git"
+  },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w packages/core && npm run build -w packages/adapters && npm run build -w packages/cli",
     "dev": "npm run dev --workspaces --if-present",
     "test": "vitest run --config tests/vitest.config.ts",
     "test:watch": "vitest --config tests/vitest.config.ts",

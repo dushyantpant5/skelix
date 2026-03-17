@@ -1,19 +1,35 @@
 {
   "name": "@skelix/adapters",
   "version": "0.1.0",
+  "description": "UI library adapters for Skelix — Tailwind, ShadCN, MUI, and Chakra UI",
+  "author": "Dushyant Pant <dushyantpant5@github>",
+  "license": "MIT",
+  "homepage": "https://github.com/dushyantpant5/skelix#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dushyantpant5/skelix.git",
+    "directory": "packages/adapters"
+  },
+  "bugs": {
+    "url": "https://github.com/dushyantpant5/skelix/issues"
+  },
+  "keywords": ["skeleton", "shimmer", "react", "tailwind", "shadcn", "mui", "chakra"],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "dependencies": {
     "@skelix/core": "*"

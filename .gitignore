@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.d.ts
+*.d.ts.map
+*.js.map
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Test output (snapshots are committed — they're the regression baseline)
+coverage/
+
+# Internal documentation (not for public consumption)
+architecture.md
+project-structure.md
+testing-strategy.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Claude Code
+.claude/
+
+# Logs
+*.log
+npm-debug.log*

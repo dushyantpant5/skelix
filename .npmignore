@@ -1,0 +1,27 @@
+# Source files (only ship dist/)
+src/
+
+# Tests
+tests/
+
+# Internal docs
+architecture.md
+project-structure.md
+testing-strategy.md
+prompt.md
+
+# Config files not needed at runtime
+tsconfig*.json
+*.tsbuildinfo
+vitest.config.ts
+
+# Dev tooling
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env*

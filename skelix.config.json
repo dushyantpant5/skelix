@@ -1,0 +1,11 @@
+{
+  "adapter": "tailwind",
+  "outputDir": null,
+  "naming": "suffix",
+  "repeatCount": 3,
+  "componentMap": {},
+  "skeleton": {
+    "baseColor": "bg-gray-200",
+    "animation": "animate-pulse"
+  }
+}

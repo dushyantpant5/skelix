@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ChakraAdapter > UserCard chakra output matches snapshot 1`] = `
+"<Flex gap="12px">
+<SkeletonCircle size="48px" />
+<Box spacing="4px">
+<SkeletonText noOfLines={1} />
+<SkeletonText noOfLines={1} />
+</Box>
+</Flex>"
+`;
+
+exports[`MuiAdapter > UserCard mui output matches snapshot 1`] = `
+"<Box sx={{ display: "flex", gap: "12px" }}>
+<Skeleton variant="circular" width="48px" height="48px" />
+<Box sx={{ '& > * + *': { marginTop: "4px" } }}>
+<Skeleton variant="text" width="200px" />
+<Skeleton variant="text" width="150px" />
+</Box>
+</Box>"
+`;
+
+exports[`ShadcnAdapter > UserCard shadcn output matches snapshot 1`] = `
+"<div className="flex gap-3 p-4">
+<Skeleton className="h-12 w-12 rounded-full" />
+<div className="space-y-1">
+<Skeleton className="w-[200px] h-6 rounded" />
+<Skeleton className="w-[150px] h-4 rounded" />
+</div>
+</div>"
+`;
+
+exports[`TailwindAdapter > UserCard tailwind output matches snapshot 1`] = `
+"<div className="flex gap-3 p-4 animate-pulse animate-pulse">
+<div className="h-12 w-12 rounded-full bg-gray-200" />
+<div className="space-y-1">
+<div className="w-[200px] h-6 rounded bg-gray-200" />
+<div className="w-[150px] h-4 rounded bg-gray-200" />
+</div>
+</div>"
+`;

@@ -1,0 +1,29 @@
+{
+  "name": "@skelix/core",
+  "version": "0.1.0",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.24.4",
+    "@babel/traverse": "^7.24.4",
+    "@babel/types": "^7.24.4",
+    "prettier": "^3.2.5",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.6",
+    "@types/fs-extra": "^11.0.4"
+  }
+}

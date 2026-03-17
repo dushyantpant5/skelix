@@ -1,0 +1,282 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`IR snapshot tests > CommentThread IR matches snapshot 1`] = `
+{
+  "children": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [],
+              "height": "h-8",
+              "layoutClasses": [],
+              "shapeClasses": [
+                "rounded-full",
+              ],
+              "sizeClasses": [
+                "h-8",
+                "w-8",
+              ],
+              "sourceTag": "img",
+              "type": "circle",
+              "width": "w-8",
+            },
+            {
+              "children": [
+                {
+                  "children": [],
+                  "height": "h-3",
+                  "layoutClasses": [],
+                  "shapeClasses": [
+                    "rounded",
+                  ],
+                  "sizeClasses": [
+                    "w-[120px]",
+                    "h-3",
+                  ],
+                  "sourceTag": "span",
+                  "type": "text",
+                  "width": "w-[120px]",
+                },
+                {
+                  "children": [],
+                  "height": "h-4",
+                  "layoutClasses": [],
+                  "shapeClasses": [
+                    "rounded",
+                  ],
+                  "sizeClasses": [
+                    "w-[150px]",
+                    "h-4",
+                  ],
+                  "sourceTag": "p",
+                  "type": "text",
+                  "width": "w-[150px]",
+                },
+              ],
+              "height": undefined,
+              "layoutClasses": [
+                "space-y-1",
+              ],
+              "shapeClasses": [],
+              "sizeClasses": [],
+              "sourceTag": "div",
+              "type": "container",
+              "width": undefined,
+            },
+          ],
+          "height": undefined,
+          "layoutClasses": [
+            "flex",
+            "gap-3",
+          ],
+          "shapeClasses": [],
+          "sizeClasses": [],
+          "sourceTag": "div",
+          "type": "container",
+          "width": undefined,
+        },
+      ],
+      "layoutClasses": [],
+      "repeatCount": 3,
+      "shapeClasses": [],
+      "sizeClasses": [],
+      "sourceTag": "div",
+      "type": "repeat",
+    },
+  ],
+  "height": undefined,
+  "layoutClasses": [
+    "space-y-4",
+  ],
+  "shapeClasses": [],
+  "sizeClasses": [],
+  "sourceTag": "div",
+  "type": "container",
+  "width": undefined,
+}
+`;
+
+exports[`IR snapshot tests > ProductTile IR matches snapshot 1`] = `
+{
+  "children": [
+    {
+      "children": [],
+      "height": "h-48",
+      "layoutClasses": [],
+      "shapeClasses": [],
+      "sizeClasses": [
+        "h-48",
+        "w-full",
+      ],
+      "sourceTag": "img",
+      "type": "image",
+      "width": "w-full",
+    },
+    {
+      "children": [
+        {
+          "children": [],
+          "height": "h-6",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded",
+          ],
+          "sizeClasses": [
+            "w-[200px]",
+            "h-6",
+          ],
+          "sourceTag": "h3",
+          "type": "text",
+          "width": "w-[200px]",
+        },
+        {
+          "children": [],
+          "height": "h-4",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded",
+          ],
+          "sizeClasses": [
+            "w-[150px]",
+            "h-4",
+          ],
+          "sourceTag": "p",
+          "type": "text",
+          "width": "w-[150px]",
+        },
+        {
+          "children": [],
+          "height": "h-3",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded",
+          ],
+          "sizeClasses": [
+            "w-[120px]",
+            "h-3",
+          ],
+          "sourceTag": "span",
+          "type": "text",
+          "width": "w-[120px]",
+        },
+        {
+          "children": [],
+          "height": "h-10",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded-md",
+          ],
+          "sizeClasses": [
+            "w-full",
+            "h-10",
+          ],
+          "sourceTag": "button",
+          "type": "rectangle",
+          "width": "w-full",
+        },
+      ],
+      "height": undefined,
+      "layoutClasses": [
+        "p-4",
+        "space-y-2",
+      ],
+      "shapeClasses": [],
+      "sizeClasses": [],
+      "sourceTag": "div",
+      "type": "container",
+      "width": undefined,
+    },
+  ],
+  "height": undefined,
+  "layoutClasses": [
+    "flex",
+    "flex-col",
+    "overflow-hidden",
+  ],
+  "shapeClasses": [
+    "rounded-lg",
+  ],
+  "sizeClasses": [],
+  "sourceTag": "div",
+  "type": "container",
+  "width": undefined,
+}
+`;
+
+exports[`IR snapshot tests > UserCard IR matches snapshot 1`] = `
+{
+  "children": [
+    {
+      "children": [],
+      "height": "h-12",
+      "layoutClasses": [],
+      "shapeClasses": [
+        "rounded-full",
+      ],
+      "sizeClasses": [
+        "h-12",
+        "w-12",
+      ],
+      "sourceTag": "img",
+      "type": "circle",
+      "width": "w-12",
+    },
+    {
+      "children": [
+        {
+          "children": [],
+          "height": "h-6",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded",
+          ],
+          "sizeClasses": [
+            "w-[200px]",
+            "h-6",
+          ],
+          "sourceTag": "h3",
+          "type": "text",
+          "width": "w-[200px]",
+        },
+        {
+          "children": [],
+          "height": "h-4",
+          "layoutClasses": [],
+          "shapeClasses": [
+            "rounded",
+          ],
+          "sizeClasses": [
+            "w-[150px]",
+            "h-4",
+          ],
+          "sourceTag": "p",
+          "type": "text",
+          "width": "w-[150px]",
+        },
+      ],
+      "height": undefined,
+      "layoutClasses": [
+        "space-y-1",
+      ],
+      "shapeClasses": [],
+      "sizeClasses": [],
+      "sourceTag": "div",
+      "type": "container",
+      "width": undefined,
+    },
+  ],
+  "height": undefined,
+  "layoutClasses": [
+    "flex",
+    "gap-3",
+    "p-4",
+  ],
+  "shapeClasses": [],
+  "sizeClasses": [],
+  "sourceTag": "div",
+  "type": "container",
+  "width": undefined,
+}
+`;

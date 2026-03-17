@@ -1,5 +1,5 @@
 {
-  "name": "@skelix/cli",
+  "name": "skelix",
   "version": "0.1.0",
   "description": "CLI to auto-generate skeleton loading components from React components",
   "author": "Dushyant Pant <dushyantpant5@github>",

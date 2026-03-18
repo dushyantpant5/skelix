@@ -31,7 +31,7 @@ exports[`ShadcnAdapter > UserCard shadcn output matches snapshot 1`] = `
 `;
 
 exports[`TailwindAdapter > UserCard tailwind output matches snapshot 1`] = `
-"<div className="flex gap-3 p-4 animate-pulse animate-pulse">
+"<div className="flex gap-3 p-4 animate-pulse">
 <div className="h-12 w-12 rounded-full bg-gray-200" />
 <div className="space-y-1">
 <div className="w-[200px] h-6 rounded bg-gray-200" />

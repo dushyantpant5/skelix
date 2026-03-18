@@ -1,7 +1,7 @@
 import type { SkeletonNode } from '@skelix/core'
 import type { AdapterOutput, SkeletonAdapter } from './types.js'
 
-function renderNode(node: SkeletonNode, isRoot: boolean, baseColor: string): string {
+function renderNode(node: SkeletonNode, baseColor: string): string {
   const allClasses = [
     ...node.layoutClasses,
     ...node.sizeClasses,
@@ -10,17 +10,15 @@ function renderNode(node: SkeletonNode, isRoot: boolean, baseColor: string): str
 
   if (node.type === 'repeat') {
     const count = node.repeatCount ?? 3
-    const inner = node.children.map(c => renderNode(c, false, baseColor)).join('\n')
+    const inner = node.children.map(c => renderNode(c, baseColor)).join('\n')
     const items = Array.from({ length: count }, () => inner).join('\n')
     return items
   }
 
   if (node.type === 'container') {
-    const pulseClass = isRoot ? ' animate-pulse' : ''
     const classes = [...allClasses].join(' ')
-    const className = classes + pulseClass
-    const children = node.children.map(c => renderNode(c, false, baseColor)).join('\n')
-    return `<div className="${className}">\n${children}\n</div>`
+    const children = node.children.map(c => renderNode(c, baseColor)).join('\n')
+    return `<div className="${classes}">\n${children}\n</div>`
   }
 
   // Skeleton primitive: circle, text, rectangle, image
@@ -51,18 +49,18 @@ export class TailwindAdapter implements SkeletonAdapter {
   }
 
   render(node: SkeletonNode): AdapterOutput {
-    // If root is a container, inject animate-pulse into it
+    // If root is a container, inject animate-pulse into its layoutClasses
     if (node.type === 'container') {
       const pulseAdded = {
         ...node,
         layoutClasses: [...node.layoutClasses, this.animation],
       }
-      const jsx = renderNode(pulseAdded, true, this.baseColor)
+      const jsx = renderNode(pulseAdded, this.baseColor)
       return { jsx, imports: [] }
     }
 
     // Non-container root: wrap in animate-pulse div
-    const inner = renderNode(node, false, this.baseColor)
+    const inner = renderNode(node, this.baseColor)
     const jsx = `<div className="${this.animation}">\n${inner}\n</div>`
     return { jsx, imports: [] }
   }

@@ -109,7 +109,7 @@ export function CommentThreadSkeleton() {
 exports[`E2E: CommentThread.tsx > generates skeleton with tailwind adapter 1`] = `
 "export function CommentThreadSkeleton() {
   return (
-    <div className="space-y-4 animate-pulse animate-pulse">
+    <div className="space-y-4 animate-pulse">
       <div className="flex gap-3">
         <div className="h-8 w-8 rounded-full bg-gray-200" />
         <div className="space-y-1">
@@ -204,7 +204,7 @@ export function ProductTileSkeleton() {
 exports[`E2E: ProductTile.tsx > generates skeleton with tailwind adapter 1`] = `
 "export function ProductTileSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden animate-pulse rounded-lg animate-pulse">
+    <div className="flex flex-col overflow-hidden animate-pulse rounded-lg">
       <div className="h-48 w-full bg-gray-200" />
       <div className="p-4 space-y-2">
         <div className="w-[200px] h-6 rounded bg-gray-200" />
@@ -282,7 +282,7 @@ export function ProfileHeaderSkeleton() {
 exports[`E2E: ProfileHeader.tsx > generates skeleton with tailwind adapter 1`] = `
 "export function ProfileHeaderSkeleton() {
   return (
-    <div className="flex items-center gap-4 p-6 animate-pulse animate-pulse">
+    <div className="flex items-center gap-4 p-6 animate-pulse">
       <div className="h-16 w-16 rounded-full bg-gray-200" />
       <div className="flex flex-col gap-1">
         <div className="w-[240px] h-7 rounded bg-gray-200" />
@@ -356,7 +356,7 @@ export function UserCardSkeleton() {
 exports[`E2E: UserCard.tsx > generates skeleton with tailwind adapter 1`] = `
 "export function UserCardSkeleton() {
   return (
-    <div className="flex gap-3 p-4 animate-pulse animate-pulse">
+    <div className="flex gap-3 p-4 animate-pulse">
       <div className="h-12 w-12 rounded-full bg-gray-200" />
       <div className="space-y-1">
         <div className="w-[200px] h-6 rounded bg-gray-200" />

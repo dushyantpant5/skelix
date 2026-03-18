@@ -100,9 +100,10 @@ export async function generateAndWrite(
   mkdirSync(outputDir, { recursive: true })
   const outputPath = join(outputDir, skeletonFileName)
 
-  // Derive component name from file name
+  // Derive component name from file name, converting kebab-case to PascalCase
   const base = basename(sourceFilePath, extname(sourceFilePath))
-  const componentName = naming === 'dot' ? `${base}Skeleton` : `${base}Skeleton`
+  const pascalBase = base.replace(/(^|[-_])(.)/g, (_, __, c) => c.toUpperCase())
+  const componentName = `${pascalBase}Skeleton`
 
   const rawCode = assembleComponent(componentName, adapterOutput.imports, adapterOutput.jsx)
   const formatted = await formatCode(rawCode, options.cwd ?? dirname(absSource))

@@ -14,6 +14,7 @@
     "url": "https://github.com/dushyantpant5/skelix/issues"
   },
   "keywords": ["skeleton", "shimmer", "react", "tailwind", "shadcn", "mui", "chakra"],
+  "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

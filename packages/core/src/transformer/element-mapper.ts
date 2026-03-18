@@ -90,7 +90,7 @@ export function mapJsxNodeToSkeleton(
       type: 'text',
       children: [],
       layoutClasses: [],
-      sizeClasses: [TEXT_DEFAULT_WIDTHS['__text__']],
+      sizeClasses: [TEXT_DEFAULT_WIDTHS['__text__'], TEXT_DEFAULT_HEIGHTS['__text__']],
       shapeClasses: ['rounded'],
       width: TEXT_DEFAULT_WIDTHS['__text__'],
       height: TEXT_DEFAULT_HEIGHTS['__text__'],
@@ -116,7 +116,16 @@ export function mapJsxNodeToSkeleton(
   const knownEntry = componentMap[node.tag] ?? componentMap[node.tag.split('.').pop() ?? '']
   if (knownEntry) {
     const defaultSizeClasses = knownEntry.defaultSize?.split(/\s+/).filter(Boolean) ?? []
-    const mergedSize = classified.sizeClasses.length > 0 ? classified.sizeClasses : defaultSizeClasses.filter(c => c.match(/^[hw]-/))
+    const defaultHeight = defaultSizeClasses.find(c => c.match(/^h-/))
+    const defaultWidth = defaultSizeClasses.find(c => c.match(/^w-/))
+    const hasHeight = classified.sizeClasses.some(c => c.match(/^h-/))
+    const hasWidth = classified.sizeClasses.some(c => c.match(/^w-/))
+    // Keep source classes but fill in missing height/width from defaultSize
+    const mergedSize = [
+      ...classified.sizeClasses,
+      ...(hasHeight || !defaultHeight ? [] : [defaultHeight]),
+      ...(hasWidth || !defaultWidth ? [] : [defaultWidth]),
+    ]
     const mergedShape = classified.shapeClasses.length > 0 ? classified.shapeClasses : defaultSizeClasses.filter(c => c.startsWith('rounded'))
 
     return {

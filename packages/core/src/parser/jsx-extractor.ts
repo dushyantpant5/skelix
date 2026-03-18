@@ -1,4 +1,6 @@
-import traverse from '@babel/traverse'
+import _traverse from '@babel/traverse'
+// @babel/traverse ships CJS — the default import may be the function itself or wrapped under .default
+const traverse = ((_traverse as any).default ?? _traverse) as typeof _traverse
 import * as t from '@babel/types'
 import type { ParseResult } from '@babel/parser'
 import type { File } from '@babel/types'

@@ -18,9 +18,9 @@ function fixture(name: string) {
 function buildIR(name: string) {
   const src = fixture(name)
   const ast = parseComponent(src)
-  const tree = extractJsxTree(ast)!
+  const { tree } = extractJsxTree(ast)
   const componentMap = buildComponentMap()
-  const ir = mapJsxNodeToSkeleton(tree, componentMap as any, 3)
+  const ir = mapJsxNodeToSkeleton(tree!, componentMap as any, 3)
   return normalizeRepeat(ir, 3)
 }
 

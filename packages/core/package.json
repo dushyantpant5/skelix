@@ -1,6 +1,6 @@
 {
   "name": "@skelix/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Core parser, transformer, and generator for Skelix — auto-generate skeleton loading components from React components",
   "author": "Dushyant Pant <dushyantpant5@github>",
   "license": "MIT",

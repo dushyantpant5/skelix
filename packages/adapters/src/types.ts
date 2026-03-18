@@ -1,4 +1,4 @@
-import type { SkeletonNode } from '@skelix/core'
+import type { SkeletonNode, ComponentMapEntry } from '@skelix/core'
 
 export interface AdapterOutput {
   jsx: string
@@ -7,6 +7,8 @@ export interface AdapterOutput {
 
 export interface SkeletonAdapter {
   name: string
+  /** Library-specific component mappings merged on top of core defaults */
+  componentMap?: Record<string, ComponentMapEntry>
   render(node: SkeletonNode): AdapterOutput
 }
 

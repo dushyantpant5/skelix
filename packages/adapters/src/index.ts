@@ -6,9 +6,9 @@ import type { SkeletonAdapter } from './types.js'
 
 export type { SkeletonAdapter, AdapterOutput } from './types.js'
 export { TailwindAdapter } from './tailwind.js'
-export { ShadcnAdapter } from './shadcn.js'
-export { MuiAdapter } from './mui.js'
-export { ChakraAdapter } from './chakra.js'
+export { ShadcnAdapter, SHADCN_COMPONENT_MAP } from './shadcn.js'
+export { MuiAdapter, MUI_COMPONENT_MAP } from './mui.js'
+export { ChakraAdapter, CHAKRA_COMPONENT_MAP } from './chakra.js'
 
 const adapters: Record<string, SkeletonAdapter> = {
   tailwind: new TailwindAdapter(),

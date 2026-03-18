@@ -10,6 +10,7 @@ export type {
 // Parser
 export { parseComponent } from './parser/babel-parser.js'
 export { extractJsxTree } from './parser/jsx-extractor.js'
+export { resolveImports } from './parser/import-resolver.js'
 
 // Transformer
 export { mapJsxNodeToSkeleton } from './transformer/element-mapper.js'

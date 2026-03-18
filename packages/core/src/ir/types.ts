@@ -33,11 +33,15 @@ export interface JsxNode {
   isLoopChild: boolean
   isConditional: boolean
   textContent?: string
+  /** Actual item count when .map() over a static array is detected */
+  staticLoopCount?: number
 }
 
 export interface ComponentMapEntry {
   type: SkeletonNodeType
   defaultSize?: string
+  /** Structural Tailwind classes injected into layoutClasses for containers (e.g. Card border/shadow) */
+  containerClasses?: string
 }
 
 export interface SkelixConfig {

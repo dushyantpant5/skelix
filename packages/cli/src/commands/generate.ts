@@ -77,7 +77,7 @@ export const generateCommand = new Command('generate')
         process.exit(1)
       }
 
-      const { outputPath } = await generateAndWrite(
+      const result = await generateAndWrite(
         file,
         {
           adapter: adapterName,
@@ -86,11 +86,16 @@ export const generateCommand = new Command('generate')
           repeatCount: mergedConfig.repeatCount,
           config: mergedConfig,
           cwd: process.cwd(),
+          adapterComponentMap: adapter.componentMap,
         },
         (node) => adapter.render(node)
       )
 
-      const shortPath = outputPath.replace(process.cwd() + '/', '')
+      if (result.skipped) {
+        process.exit(0)
+      }
+
+      const shortPath = result.outputPath.replace(process.cwd() + '/', '')
       console.log(chalk.green(`✔ Generated ${shortPath}`))
     } catch (err) {
       if (err instanceof SyntaxError || (err as any)?.code === 'BABEL_PARSE_ERROR') {

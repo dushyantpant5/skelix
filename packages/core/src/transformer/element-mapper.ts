@@ -75,10 +75,14 @@ function hasEqualDimensions(sizeClasses: string[]): boolean {
   return w.replace('w-', '') === h.replace('h-', '')
 }
 
+/** Callback used by the generator to inline local component skeletons via deep traversal */
+export type ComponentResolver = (tag: string) => SkeletonNode | null
+
 export function mapJsxNodeToSkeleton(
   node: JsxNode,
   componentMap: Record<string, ReturnType<typeof lookupComponent> extends infer T ? Exclude<T, undefined> : never>,
-  repeatCount: number
+  repeatCount: number,
+  resolver?: ComponentResolver
 ): SkeletonNode {
   const className = node.attributes.className ?? ''
   const classified = detectLayoutClasses(className)
@@ -98,16 +102,16 @@ export function mapJsxNodeToSkeleton(
     }
   }
 
-  // Handle loop (.map) children
+  // Handle loop (.map) children — use staticLoopCount when the array length is statically known
   if (node.isLoopChild) {
-    const inner = mapJsxNodeToSkeleton({ ...node, isLoopChild: false }, componentMap, repeatCount)
+    const inner = mapJsxNodeToSkeleton({ ...node, isLoopChild: false }, componentMap, repeatCount, resolver)
     return {
       type: 'repeat',
       children: [inner],
       layoutClasses: [],
       sizeClasses: [],
       shapeClasses: [],
-      repeatCount,
+      repeatCount: node.staticLoopCount ?? repeatCount,
       sourceTag: node.tag,
     }
   }
@@ -120,22 +124,31 @@ export function mapJsxNodeToSkeleton(
     const defaultWidth = defaultSizeClasses.find(c => c.match(/^w-/))
     const hasHeight = classified.sizeClasses.some(c => c.match(/^h-/))
     const hasWidth = classified.sizeClasses.some(c => c.match(/^w-/))
-    // Keep source classes but fill in missing height/width from defaultSize
     const mergedSize = [
       ...classified.sizeClasses,
       ...(hasHeight || !defaultHeight ? [] : [defaultHeight]),
       ...(hasWidth || !defaultWidth ? [] : [defaultWidth]),
     ]
     const mergedShape = classified.shapeClasses.length > 0 ? classified.shapeClasses : defaultSizeClasses.filter(c => c.startsWith('rounded'))
+    const containerClasses = knownEntry.containerClasses?.split(/\s+/).filter(Boolean) ?? []
+    const mappedChildren = node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount, resolver))
+
+    // If a non-container component wraps structural JSX children (not just text), treat it as a
+    // transparent container so inner layout is preserved rather than discarded.
+    // Text-only content (e.g. <Badge>Verified</Badge>) keeps the component as a primitive.
+    const hasStructuralChildren = node.children.some(c => c.tag !== '__text__')
+    const resolvedType = knownEntry.type !== 'container' && hasStructuralChildren
+      ? 'container'
+      : knownEntry.type
 
     return {
-      type: knownEntry.type,
-      children: node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount)),
-      layoutClasses: classified.layoutClasses,
-      sizeClasses: mergedSize,
-      shapeClasses: mergedShape,
-      width: extractWidth(mergedSize),
-      height: extractHeight(mergedSize),
+      type: resolvedType,
+      children: mappedChildren,
+      layoutClasses: [...classified.layoutClasses, ...containerClasses],
+      sizeClasses: resolvedType === 'container' ? [] : mergedSize,
+      shapeClasses: resolvedType === 'container' ? [] : mergedShape,
+      width: resolvedType === 'container' ? undefined : extractWidth(mergedSize),
+      height: resolvedType === 'container' ? undefined : extractHeight(mergedSize),
       sourceTag: node.tag,
     }
   }
@@ -144,13 +157,47 @@ export function mapJsxNodeToSkeleton(
   const nativeType = NATIVE_HTML_MAP[node.tag.toLowerCase()]
 
   if (!nativeType) {
-    // Unknown component fallback
+    const isCustomComponent = /^[A-Z]/.test(node.tag)
+    if (isCustomComponent) {
+      // Deep traversal: try to resolve local source file and inline its skeleton
+      if (resolver) {
+        const resolved = resolver(node.tag)
+        if (resolved) return resolved
+      }
+
+      // No source available — bounding-box for leaf components, container for those with children
+      if (node.children.length === 0) {
+        console.warn(
+          `⚠ Unknown component <${node.tag}> — rendered as placeholder. Add it to skelix.config.json to customize.`
+        )
+        return {
+          type: 'rectangle',
+          children: [],
+          layoutClasses: classified.layoutClasses,
+          sizeClasses: classified.sizeClasses.length > 0 ? classified.sizeClasses : ['h-10', 'w-full'],
+          shapeClasses: classified.shapeClasses.length > 0 ? classified.shapeClasses : ['rounded-md'],
+          width: 'w-full',
+          height: 'h-10',
+          sourceTag: node.tag,
+        }
+      }
+      // Has JSX children — transparent container
+      return {
+        type: 'container',
+        children: node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount, resolver)),
+        layoutClasses: classified.layoutClasses,
+        sizeClasses: classified.sizeClasses,
+        shapeClasses: classified.shapeClasses,
+        sourceTag: node.tag,
+      }
+    }
+
     console.warn(
       `⚠ Unknown component <${node.tag}> — mapped to rectangle. Add it to skelix.config.json to customize.`
     )
     return {
       type: 'rectangle',
-      children: node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount)),
+      children: [],
       layoutClasses: classified.layoutClasses,
       sizeClasses: classified.sizeClasses,
       shapeClasses: classified.shapeClasses,
@@ -193,7 +240,7 @@ export function mapJsxNodeToSkeleton(
   return {
     type: resolvedType,
     children: nativeType === 'container'
-      ? node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount))
+      ? node.children.map(c => mapJsxNodeToSkeleton(c, componentMap, repeatCount, resolver))
       : [],
     layoutClasses: classified.layoutClasses,
     sizeClasses: classified.sizeClasses,

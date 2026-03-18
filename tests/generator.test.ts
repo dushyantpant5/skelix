@@ -19,9 +19,9 @@ function fixture(name: string) {
 async function generateSkeletonString(fixtureName: string, adapter: any): Promise<string> {
   const src = fixture(fixtureName)
   const ast = parseComponent(src)
-  const tree = extractJsxTree(ast)!
+  const { tree } = extractJsxTree(ast)
   const componentMap = buildComponentMap()
-  let ir = mapJsxNodeToSkeleton(tree, componentMap as any, 3)
+  let ir = mapJsxNodeToSkeleton(tree!, componentMap as any, 3)
   ir = normalizeRepeat(ir, 3)
 
   const { jsx, imports } = adapter.render(ir)

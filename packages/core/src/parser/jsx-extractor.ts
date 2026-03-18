@@ -10,7 +10,6 @@ function getTagName(node: t.JSXOpeningElement): string {
   const name = node.name
   if (t.isJSXIdentifier(name)) return name.name
   if (t.isJSXMemberExpression(name)) {
-    // e.g. Foo.Bar -> "Foo.Bar"
     const obj = t.isJSXIdentifier(name.object) ? name.object.name : 'Unknown'
     return `${obj}.${name.property.name}`
   }
@@ -30,7 +29,6 @@ function getAttributes(opening: t.JSXOpeningElement): Record<string, string> {
       if (t.isStringLiteral(attr.value.expression)) {
         attrs[key] = attr.value.expression.value
       } else if (t.isTemplateLiteral(attr.value.expression)) {
-        // Extract static parts of template literals
         attrs[key] = attr.value.expression.quasis.map(q => q.value.cooked ?? '').join(' ')
       } else {
         attrs[key] = ''
@@ -40,10 +38,39 @@ function getAttributes(opening: t.JSXOpeningElement): Record<string, string> {
   return attrs
 }
 
+/** Pre-pass: collect lengths of statically-declared arrays (const items = [...]) */
+function collectStaticArrayLengths(ast: ParseResult<File>): Map<string, number> {
+  const lengths = new Map<string, number>()
+  traverse(ast, {
+    VariableDeclarator(path) {
+      const { id, init } = path.node
+      if (t.isIdentifier(id) && t.isArrayExpression(init)) {
+        lengths.set(id.name, init.elements.length)
+      }
+    },
+  })
+  return lengths
+}
+
+function findRootJsx(body: t.Statement[]): t.JSXElement | t.JSXFragment | null {
+  for (const stmt of body) {
+    if (t.isReturnStatement(stmt) && stmt.argument) {
+      if (t.isJSXElement(stmt.argument)) return stmt.argument
+      if (t.isJSXFragment(stmt.argument)) return stmt.argument
+    }
+    if (t.isExpressionStatement(stmt) && t.isJSXElement(stmt.expression)) {
+      return stmt.expression
+    }
+  }
+  return null
+}
+
 function extractJsxElement(
   node: t.JSXElement,
   isLoopChild: boolean,
-  isConditional: boolean
+  isConditional: boolean,
+  arrayLengths: Map<string, number>,
+  staticLoopCount?: number,
 ): JsxNode {
   const tag = getTagName(node.openingElement)
   const attributes = getAttributes(node.openingElement)
@@ -51,47 +78,51 @@ function extractJsxElement(
 
   for (const child of node.children) {
     if (t.isJSXElement(child)) {
-      children.push(extractJsxElement(child, false, false))
+      children.push(extractJsxElement(child, false, false, arrayLengths))
     } else if (t.isJSXExpressionContainer(child)) {
       const expr = child.expression
       if (t.isCallExpression(expr)) {
-        // Handle .map() calls
+        // Handle .map() calls — detect static array length when available
         const callee = expr.callee
         if (
           t.isMemberExpression(callee) &&
           t.isIdentifier(callee.property, { name: 'map' })
         ) {
+          let loopCount: number | undefined
+          if (t.isIdentifier(callee.object)) {
+            loopCount = arrayLengths.get(callee.object.name)
+          }
+
           const callback = expr.arguments[0]
           if (
             (t.isArrowFunctionExpression(callback) || t.isFunctionExpression(callback)) &&
             t.isJSXElement(callback.body)
           ) {
-            children.push(extractJsxElement(callback.body, true, false))
+            const child = extractJsxElement(callback.body, true, false, arrayLengths)
+            children.push({ ...child, staticLoopCount: loopCount })
           } else if (
             (t.isArrowFunctionExpression(callback) || t.isFunctionExpression(callback)) &&
             t.isBlockStatement(callback.body)
           ) {
-            // Find return statement
             for (const stmt of callback.body.body) {
               if (t.isReturnStatement(stmt) && stmt.argument && t.isJSXElement(stmt.argument)) {
-                children.push(extractJsxElement(stmt.argument, true, false))
+                const child = extractJsxElement(stmt.argument, true, false, arrayLengths)
+                children.push({ ...child, staticLoopCount: loopCount })
               }
             }
           }
         }
       } else if (t.isLogicalExpression(expr) && expr.operator === '&&') {
-        // {condition && <Element />}
+        // {condition && <Element />} — keep the single branch
         if (t.isJSXElement(expr.right)) {
-          children.push(extractJsxElement(expr.right, false, true))
+          children.push(extractJsxElement(expr.right, false, true, arrayLengths))
         }
       } else if (t.isConditionalExpression(expr)) {
-        // {condition ? <A /> : <B />}
+        // {condition ? <A /> : <B />} — only take the primary (truthy) branch
         if (t.isJSXElement(expr.consequent)) {
-          children.push(extractJsxElement(expr.consequent, false, true))
+          children.push(extractJsxElement(expr.consequent, false, true, arrayLengths))
         }
-        if (t.isJSXElement(expr.alternate)) {
-          children.push(extractJsxElement(expr.alternate, false, true))
-        }
+        // alternate branch intentionally omitted — skeleton shows the default state
       }
     } else if (t.isJSXText(child)) {
       const text = child.value.trim()
@@ -108,102 +139,114 @@ function extractJsxElement(
     } else if (t.isJSXFragment(child)) {
       for (const fragChild of child.children) {
         if (t.isJSXElement(fragChild)) {
-          children.push(extractJsxElement(fragChild, false, false))
+          children.push(extractJsxElement(fragChild, false, false, arrayLengths))
         }
       }
     }
   }
 
-  return { tag, attributes, children, isLoopChild, isConditional }
-}
-
-function findRootJsx(body: t.Statement[]): t.JSXElement | t.JSXFragment | null {
-  for (const stmt of body) {
-    if (t.isReturnStatement(stmt) && stmt.argument) {
-      if (t.isJSXElement(stmt.argument)) return stmt.argument
-      if (t.isJSXFragment(stmt.argument)) return stmt.argument
-      // Handle parenthesized returns
-    }
-    if (t.isExpressionStatement(stmt) && t.isJSXElement(stmt.expression)) {
-      return stmt.expression
+  // Extract render prop functions (e.g. <FormField render={() => <JSX />} />)
+  for (const attr of node.openingElement.attributes) {
+    if (!t.isJSXAttribute(attr) || !t.isJSXExpressionContainer(attr.value)) continue
+    const expr = attr.value.expression
+    if (t.isArrowFunctionExpression(expr) || t.isFunctionExpression(expr)) {
+      const body = expr.body
+      if (t.isJSXElement(body)) {
+        children.push(extractJsxElement(body, false, false, arrayLengths))
+      } else if (t.isBlockStatement(body)) {
+        const found = findRootJsx(body.body)
+        if (found && t.isJSXElement(found)) {
+          children.push(extractJsxElement(found, false, false, arrayLengths))
+        }
+      }
     }
   }
-  return null
+
+  // Tabs — only keep the TabsContent matching defaultValue to avoid rendering all panels
+  if (tag === 'Tabs' && attributes.defaultValue) {
+    const defaultValue = attributes.defaultValue
+    const filteredChildren = children.filter(child => {
+      if (child.tag === 'TabsContent') {
+        return child.attributes.value === defaultValue
+      }
+      return true
+    })
+    return { tag, attributes, children: filteredChildren, isLoopChild, isConditional, staticLoopCount }
+  }
+
+  return { tag, attributes, children, isLoopChild, isConditional, staticLoopCount }
 }
 
-export function extractJsxTree(ast: ParseResult<File>): JsxNode | null {
+export interface ExtractResult {
+  tree: JsxNode | null
+  componentName: string | null
+}
+
+/** Extract both the JSX tree and the exported component's function name from the AST */
+export function extractJsxTree(ast: ParseResult<File>): ExtractResult {
   let rootNode: JsxNode | null = null
+  let componentName: string | null = null
+  const arrayLengths = collectStaticArrayLengths(ast)
+
+  function resolveRoot(found: t.JSXElement | t.JSXFragment): JsxNode {
+    if (t.isJSXElement(found)) {
+      return extractJsxElement(found, false, false, arrayLengths)
+    }
+    const children: JsxNode[] = []
+    for (const child of found.children) {
+      if (t.isJSXElement(child)) children.push(extractJsxElement(child, false, false, arrayLengths))
+    }
+    return { tag: 'div', attributes: {}, children, isLoopChild: false, isConditional: false }
+  }
 
   traverse(ast, {
     // Arrow function component: const Foo = () => <JSX />
     ArrowFunctionExpression(path) {
       if (rootNode) return
       const body = path.node.body
+
+      // Capture the variable name (const Foo = () => ...)
+      if (!componentName && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+        componentName = path.parent.id.name
+      }
+
       if (t.isJSXElement(body)) {
-        rootNode = extractJsxElement(body, false, false)
+        rootNode = extractJsxElement(body, false, false, arrayLengths)
         path.stop()
-        return
-      }
-      if (t.isJSXFragment(body)) {
-        // Wrap fragment children in a synthetic container
-        const children: JsxNode[] = []
-        for (const child of body.children) {
-          if (t.isJSXElement(child)) children.push(extractJsxElement(child, false, false))
-        }
-        rootNode = { tag: 'div', attributes: {}, children, isLoopChild: false, isConditional: false }
+      } else if (t.isJSXFragment(body)) {
+        rootNode = resolveRoot(body)
         path.stop()
-        return
-      }
-      if (t.isBlockStatement(body)) {
+      } else if (t.isBlockStatement(body)) {
         const found = findRootJsx(body.body)
         if (found) {
-          if (t.isJSXElement(found)) {
-            rootNode = extractJsxElement(found, false, false)
-          } else {
-            const children: JsxNode[] = []
-            for (const child of found.children) {
-              if (t.isJSXElement(child)) children.push(extractJsxElement(child, false, false))
-            }
-            rootNode = { tag: 'div', attributes: {}, children, isLoopChild: false, isConditional: false }
-          }
+          rootNode = resolveRoot(found)
           path.stop()
         }
       }
     },
-    // Function declaration/expression component
+
     FunctionDeclaration(path) {
       if (rootNode) return
+      if (!componentName && path.node.id) componentName = path.node.id.name
       const found = findRootJsx(path.node.body.body)
       if (found) {
-        if (t.isJSXElement(found)) {
-          rootNode = extractJsxElement(found, false, false)
-        } else {
-          const children: JsxNode[] = []
-          for (const child of found.children) {
-            if (t.isJSXElement(child)) children.push(extractJsxElement(child, false, false))
-          }
-          rootNode = { tag: 'div', attributes: {}, children, isLoopChild: false, isConditional: false }
-        }
+        rootNode = resolveRoot(found)
         path.stop()
       }
     },
+
     FunctionExpression(path) {
       if (rootNode) return
+      if (!componentName && t.isVariableDeclarator(path.parent) && t.isIdentifier(path.parent.id)) {
+        componentName = path.parent.id.name
+      }
       const found = findRootJsx(path.node.body.body)
       if (found) {
-        if (t.isJSXElement(found)) {
-          rootNode = extractJsxElement(found, false, false)
-        } else {
-          const children: JsxNode[] = []
-          for (const child of found.children) {
-            if (t.isJSXElement(child)) children.push(extractJsxElement(child, false, false))
-          }
-          rootNode = { tag: 'div', attributes: {}, children, isLoopChild: false, isConditional: false }
-        }
+        rootNode = resolveRoot(found)
         path.stop()
       }
     },
   })
 
-  return rootNode
+  return { tree: rootNode, componentName }
 }

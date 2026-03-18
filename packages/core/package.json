@@ -1,6 +1,6 @@
 {
   "name": "@skelix/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core parser, transformer, and generator for Skelix — auto-generate skeleton loading components from React components",
   "author": "Dushyant Pant <dushyantpant5@github>",
   "license": "MIT",
@@ -13,7 +13,15 @@
   "bugs": {
     "url": "https://github.com/dushyantpant5/skelix/issues"
   },
-  "keywords": ["skeleton", "shimmer", "react", "loading", "tailwind", "ast", "codegen"],
+  "keywords": [
+    "skeleton",
+    "shimmer",
+    "react",
+    "loading",
+    "tailwind",
+    "ast",
+    "codegen"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
